@@ -63,31 +63,26 @@ function showAvailableMoves(piece) {
 		}
 
 		checkAttack(possibleSquares, originalPosition, 'pawn', side)
-
-		if (possibleSquares.length > 0) {
-			possibleSquares.forEach(square => {
-				square.dataset.show_possible = true
-				square.addEventListener('click', moveHandler)
-			})
-		}
+		submitPossibleSquares(possibleSquares)
 	}
 
 	if (piece.classList.contains('knight-container')) {
-		checkKnightMove(possibleSquares, originalPosition, -1, 2, side)
-		checkKnightMove(possibleSquares, originalPosition, -1, -2, side)
-		checkKnightMove(possibleSquares, originalPosition, 1, 2, side)
-		checkKnightMove(possibleSquares, originalPosition, 1, -2, side)
-		checkKnightMove(possibleSquares, originalPosition, 2, -1, side)
-		checkKnightMove(possibleSquares, originalPosition, 2, 1, side)
-		checkKnightMove(possibleSquares, originalPosition, -2, -1, side)
-		checkKnightMove(possibleSquares, originalPosition, -2, 1, side)
+		checkKnightMove(possibleSquares, originalPosition, side)
+		submitPossibleSquares(possibleSquares)
+	}
 
-		if (possibleSquares.length > 0) {
-			possibleSquares.forEach(square => {
-				square.dataset.show_possible = true
-				square.addEventListener('click', moveHandler)
-			})
-		}
+	if (piece.classList.contains('bishop-container')) {
+		checkBishopMove(possibleSquares, originalPosition, side)
+		submitPossibleSquares(possibleSquares)
+	}
+}
+
+function submitPossibleSquares(array) {
+	if (array.length > 0) {
+		array.forEach(square => {
+			square.dataset.show_possible = true
+			square.addEventListener('click', moveHandler)
+		})
 	}
 }
 
@@ -147,6 +142,10 @@ function moveToSquare(piece, origin, destination) {
 		placePiece(document.createElement('div'), 'knight', side, destination)
 	}
 
+	if (piece.classList.contains('bishop-container')) {
+		placePiece(document.createElement('div'), 'bishop', side, destination)
+	}
+
 	resetPossibleSquares()
 	checkOccupation()
 }
@@ -203,16 +202,52 @@ function checkAttack(array, position, piece, side) {
 	}
 }
 
-function checkKnightMove(array, position, fileOffset, rankOffset, side) {
+function checkKnightMove(array, position, side) {
 	let possibleSquare
+	const offsets = [[1, 2], [1, -2], [-1, 2], [-1, -2], [2, 1], [2, -1], [-2, 1], [-2, -1]]
 	for (let i = 0; i < FILES.length; i++) {
 		if (FILES[i] == position[0]) {
-			possibleSquare = document.getElementById(`${FILES[i + fileOffset]}${parseInt(position[1]) + rankOffset}`)
-			if (possibleSquare && possibleSquare.dataset.occupied == "false") {
-				array.push(possibleSquare)
-			} else if (possibleSquare && possibleSquare.childNodes[0].dataset.side != side) {
-				array.push(possibleSquare)
+			for (let j = 0; j < offsets.length; j++) {
+				possibleSquare = document.getElementById(`${FILES[i + offsets[j][0]]}${parseInt(position[1]) + offsets[j][1]}`)
+				if (possibleSquare && (possibleSquare.dataset.occupied == "false" || possibleSquare.childNodes[0].dataset.side != side)) {
+					array.push(possibleSquare)
+				}
 			}
+		}
+	}
+}
+
+function checkBishopMove(array, position, side) {
+	for (let i = 0; i < FILES.length; i++) {
+		if (FILES[i] == position[0]) {
+			let fileIndex = i
+			checkDiagonal(1, 1, fileIndex)
+			checkDiagonal(1, -1, fileIndex)
+			checkDiagonal(-1, 1, fileIndex)
+			checkDiagonal(-1, -1, fileIndex)
+		}
+	}
+
+	function checkDiagonal(fileOffset, rankOffset, fileIndex) {
+		let j = true
+		let possibleSquare
+		while (j) {
+			possibleSquare = document.getElementById(`${FILES[fileIndex + fileOffset]}${parseInt(position[1]) + rankOffset}`)
+			fileOffset > 0 ? fileOffset++ : fileOffset--
+			rankOffset > 0 ? rankOffset++ : rankOffset--
+
+			pushToArray(possibleSquare)
+
+			if (!possibleSquare || possibleSquare.dataset.occupied == 'true') {
+				j = false
+				break
+			}
+		}
+	}
+
+	function pushToArray(square) {
+		if (square && (square.dataset.occupied == 'false' || square.childNodes[0].dataset.side != side)) {
+			array.push(square)
 		}
 	}
 }
