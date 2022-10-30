@@ -75,6 +75,22 @@ function showAvailableMoves(piece) {
 		checkBishopMove(possibleSquares, originalPosition, side)
 		submitPossibleSquares(possibleSquares)
 	}
+
+	if (piece.classList.contains('rook-container')) {
+		checkRookMove(possibleSquares, originalPosition, side)
+		submitPossibleSquares(possibleSquares)
+	}
+
+	if (piece.classList.contains('queen-container')) {
+		checkBishopMove(possibleSquares, originalPosition, side)
+		checkRookMove(possibleSquares, originalPosition, side)
+		submitPossibleSquares(possibleSquares)
+	}
+
+	if (piece.classList.contains('king-container')) {
+		checkKingMove(possibleSquares, originalPosition, side)
+		submitPossibleSquares(possibleSquares)
+	}
 }
 
 function submitPossibleSquares(array) {
@@ -144,6 +160,18 @@ function moveToSquare(piece, origin, destination) {
 
 	if (piece.classList.contains('bishop-container')) {
 		placePiece(document.createElement('div'), 'bishop', side, destination)
+	}
+
+	if (piece.classList.contains('rook-container')) {
+		placePiece(document.createElement('div'), 'rook', side, destination)
+	}
+
+	if (piece.classList.contains('queen-container')) {
+		placePiece(document.createElement('div'), 'queen', side, destination)
+	}
+
+	if (piece.classList.contains('king-container')) {
+		placePiece(document.createElement('div'), 'king', side, destination)
 	}
 
 	resetPossibleSquares()
@@ -250,4 +278,130 @@ function checkBishopMove(array, position, side) {
 			array.push(square)
 		}
 	}
+}
+
+function checkRookMove (array, position, side) {
+
+	for (let i = 0; i < FILES.length; i++) {
+		if (FILES[i] == position[0]) {
+			let fileIndex = i
+			checkStraight(fileIndex)
+		}
+	}
+
+
+	function checkStraight(fileIndex) {
+		// Up
+		let count = 1
+		let j = true
+		let possibleSquare
+		while (j) {
+			possibleSquare = document.getElementById(`${FILES[fileIndex]}${parseInt(position[1]) + count}`)
+			pushToArray(possibleSquare)
+
+			count++
+
+			if (!possibleSquare || possibleSquare.dataset.occupied == 'true') {
+				j = false
+				break
+			}
+		}
+
+		// Down
+		count = -1
+		j = true
+		while (j) {
+			possibleSquare = document.getElementById(`${FILES[fileIndex]}${parseInt(position[1]) + count}`)
+			pushToArray(possibleSquare)
+
+			count--
+
+			if (!possibleSquare || possibleSquare.dataset.occupied == 'true') {
+				j = false
+				break
+			}
+		}
+
+		// Right
+		count = 1
+		j = true
+		while (j) {
+			possibleSquare = document.getElementById(`${FILES[fileIndex + count]}${parseInt(position[1])}`)
+			pushToArray(possibleSquare)
+
+			count++
+
+			if (!possibleSquare || possibleSquare.dataset.occupied == 'true') {
+				j = false
+				break
+			}
+		}
+
+		// Left
+		count = -1
+		j = true
+		while (j) {
+			possibleSquare = document.getElementById(`${FILES[fileIndex + count]}${parseInt(position[1])}`)
+			pushToArray(possibleSquare)
+
+			count--
+
+			if (!possibleSquare || possibleSquare.dataset.occupied == 'true') {
+				j = false
+				break
+			}
+		}
+	}
+
+	function pushToArray(square) {
+		if (square && (square.dataset.occupied == 'false' || square.childNodes[0].dataset.side != side)) {
+			array.push(square)
+		}
+	}
+}
+
+function checkKingMove(array, position, side) {
+	let fileIndex,
+			possibleSquare
+
+	for (let i = 0; i < FILES.length; i++) {
+		if (FILES[i] == position[0]) {
+			fileIndex = i
+			break
+		}
+	} 
+
+	possibleSquare = document.getElementById(`${FILES[fileIndex - 1]}${position[1]}`)
+	pushToArray(possibleSquare)
+
+	possibleSquare = document.getElementById(`${FILES[fileIndex + 1]}${position[1]}`)
+	pushToArray(possibleSquare)
+
+	possibleSquare = document.getElementById(`${FILES[fileIndex]}${parseInt(position[1]) + 1}`)
+	pushToArray(possibleSquare)
+
+	possibleSquare = document.getElementById(`${FILES[fileIndex]}${parseInt(position[1]) - 1}`)
+	pushToArray(possibleSquare)
+
+	possibleSquare = document.getElementById(`${FILES[fileIndex + 1]}${parseInt(position[1]) - 1}`)
+	pushToArray(possibleSquare)
+
+	possibleSquare = document.getElementById(`${FILES[fileIndex - 1]}${parseInt(position[1]) - 1}`)
+	pushToArray(possibleSquare)
+
+	possibleSquare = document.getElementById(`${FILES[fileIndex + 1]}${parseInt(position[1]) + 1}`)
+	pushToArray(possibleSquare)
+
+	possibleSquare = document.getElementById(`${FILES[fileIndex - 1]}${parseInt(position[1]) + 1}`)
+	pushToArray(possibleSquare)
+
+	console.log(array)
+
+
+	function pushToArray(square) {
+		if (square && (square.dataset.occupied == 'false' || square.childNodes[0].dataset.side != side)) {
+			array.push(square)
+		}
+	}
+
 }

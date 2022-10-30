@@ -48,18 +48,31 @@ body {
 .piece-container {
 	display: flex;
 	justify-content: center;
-	align-items: end;
+	align-items: center;
 	width: 100%;
 	height: 100%;
 	
 }
 
 .piece-container svg {
-	width: 35px;
+	width: 40px;
 }
 
 .pawn-container svg {
-	width: 34px;
+	width: 32px;
+}
+
+.bishop-container svg {
+	width: 35px;
+}
+
+
+.queen-container svg {
+	width: 56px;
+}
+
+.king-container svg {
+	width: 46px;
 }
 
 [data-occupied=true] {
@@ -78,7 +91,7 @@ body {
 [data-show_possible=true]::before {
 	content: "";
 	position: absolute;
-	width: 30px;
+	width: 15px;
 	aspect-ratio: 1 / 1;
 	background-color: #F6AB04;
 	top: 50%;
@@ -89,4 +102,13 @@ body {
 
 .turn-keeper {
 	color: #fff;
+}
+
+.piece-container.selected svg {
+	filter: drop-shadow(0px 0px 10px rgb(255, 155, 0));
+}
+
+.piece-container[data-side=light] svg {
+	stroke-width: 3px;
+	stroke: #000;
 }
